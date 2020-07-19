@@ -1,1 +1,1 @@
-web: gunicorn fitSensei:fitSensei.py
+web: gunicorn fitSensei:fitSensei
