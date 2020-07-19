@@ -1,1 +1,1 @@
-web: gunicorn fitSensei:fitSensei
+web: gunicorn fitSensei:app
