@@ -31,9 +31,9 @@ def handle_messages():
                     message_text = messaging_event["message"]["text"]
                     response = 'I do not understand that yet'
                     for message_text in GREETINGS
-                        respone = 'Hi welcome to Fit Sensei'
+                        response = 'Hi welcome to Fit Sensei'
                         
-                    send_message(sender_id, "Hi, Welcome to Fit Sensei")
+                    send_message(sender_id, response
 
                 if messaging_event.get("delivery"):
                     pass
