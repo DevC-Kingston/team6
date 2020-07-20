@@ -30,7 +30,7 @@ def handle_messages():
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
                     response = 'I do not understand that yet'
-                    if message_text in GREETINGS
+                    if message_text in GREETINGS:
                         response = 'Hi welcome to Fit Sensei'
                         
                     send_message(sender_id, response)
