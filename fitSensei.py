@@ -6,7 +6,7 @@ import json
 from Credentials import *
 
 app = Flask(__name__)
-
+GREETINGS = ['hi', 'hello', 'howdy', 'hey']
 
 @app.route('/', methods=['GET'])
 def handle_verification():
@@ -29,7 +29,10 @@ def handle_messages():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-
+                    response = 'I do not understand that yet'
+                    for message_text in GREETINGS
+                        respone = 'Hi welcome to Fit Sensei'
+                        
                     send_message(sender_id, "Hi, Welcome to Fit Sensei")
 
                 if messaging_event.get("delivery"):
@@ -61,7 +64,7 @@ def send_message(recipient_id, message_text):
             "text": message_text
         }
     })
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+    r = requests.post("https://graph.facebook.com/v2.6 /me/messages", params=params, headers=headers, data=data)
     if r.status_code != 200:
         log(r.status_code)
     log(r.text)
