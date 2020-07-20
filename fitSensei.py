@@ -33,7 +33,7 @@ def handle_messages():
                     if message_text in GREETINGS
                         response = 'Hi welcome to Fit Sensei'
                         
-                    send_message(sender_id, response
+                    send_message(sender_id, response)
 
                 if messaging_event.get("delivery"):
                     pass
