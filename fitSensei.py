@@ -30,7 +30,6 @@ def handle_messages():
                     userinfo = json.loads(getFirstName(sender_id))
                     response = 'Sorry, I do not understand that as yet'
                     if message_text in GREETINGS:
-                        response = 'Hi welcome to Fit Sensei'
                         response = 'Nǐ hǎo ' +userinfo.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
                         send_quickreply(sender_id, response)
                     elif message_text == "Track my progress":
