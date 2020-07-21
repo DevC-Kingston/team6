@@ -19,22 +19,28 @@ def handle_verification():
 def handle_messages():
     data = request.get_json()
     log(data)
-
+    
     if data["object"] == "page":
-
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
-
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-                    response = 'I do not understand that yet'
+                    userinfo = json.loads(getFirstName(sender_id))
+                    response = 'Sorry, I do not understand that as yet'
                     if message_text in GREETINGS:
                         response = 'Hi welcome to Fit Sensei'
-                        
-                    send_message(sender_id, response)
-
+                        response = 'Nǐ hǎo ' +userinfo.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
+                        send_quickreply(sender_id, response)
+                    elif message_text == "Track my progress":
+                        response = "You selected track your progress"
+                        send_message(sender_id, response)
+                    elif message_text == "find exercise":
+                        response = "You selected find exercise"
+                        send_message(sender_id, response)
+                    else:
+                        send_message(sender_id, response)
                 if messaging_event.get("delivery"):
                     pass
 
@@ -69,7 +75,56 @@ def send_message(recipient_id, message_text):
         log(r.status_code)
     log(r.text)
 
+def send_quickreply(recipient_id, message_text):
+    
+    params = {
+        "access_token": PAGE_ACCESS_TOKEN
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "messaging_type": "RESPONSE",
+        "message": {
+            "text": message_text,
+            "quick_replies": [
+                {
+                    "content_type": "text",
+                    "title": "Find Exercise",
+                    "payload": "POSTBACK_PAYLOAD1"
+                },
+                {
+                    "content_type": "text",
+                    "title": "Track my progress",
+                    "payload": "POSTBACK_PAYLOAD2"
+                }
+            ]
+        }
+    })
+    r = requests.post("https://graph.facebook.com/v7.0/me/messages", params=params, headers=headers, data=data)
+    if r.status_code != 200:
+        log(r.status_code)
+    log(r.text)
 
+@app.route('/', methods=['GET'])
+def getFirstName(sender_id):
+    
+    params = {
+        ("fields", "first_name"),
+        ("access_token", PAGE_ACCESS_TOKEN)
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    r = requests.get("https://graph.facebook.com/"+sender_id, params=params, headers=headers)
+    if r.status_code != 200:
+        log(r.status_code)
+    log(r.text)
+    return r.text
+    
 def log(message):  # simple wrapper for logging to stdout on heroku
     print(message)
     sys.stdout.flush()
