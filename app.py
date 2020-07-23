@@ -14,6 +14,7 @@ app = Flask(__name__)
 
 bot = Bot(PAGE_ACCESS_TOKEN)
 GREETINGS = ['is anyone available to chat?', 'wah gwaan', 'sup','hey','hi','yo','hello','good afternoon', 'howdy', 'i have a question']
+FAREWELL = ['goodbye', 'bye', 'See you soon', 'Sayonara', 'farewell', "i'm out", 'later']
     
 def populate_table():
     try: 
@@ -114,6 +115,14 @@ def webhook():
                             elif messaging_text == "track my progress" or mainTag == 5:
                                 mainTag = 5
                                 handleMessage(messaging_text, senderId)
+                            elif messaging_text in FAREWELL:
+                                mainTag = 1
+                                currPath = 1
+                                workoutTag = None
+                                bot.send_text_message(senderId, "Thank you for using Fit Sensei! Please come back to my dojo soon")
+                                bot.send_text_message(senderId, "Sayaonara")
+                                sendAction(senderId)
+                                bot.send_image_url(senderId, "https://media.tenor.com/images/ddea728f093b044c694be9561096813b/raw")
                             else:
                                 mainTag = 1
                                 initJoin = 1
@@ -195,9 +204,8 @@ def handleMessage(message,senderId):
         conn.close()
     elif mainTag == 3:
         if currPath == 1:
-            response = "So you want the Fit Sensei to give you a workout huh? I'll give you the workout of your life"
-            bot.send_text_message(senderId, response)
-            send_quickreplyWorkout(senderId, "Where do you want to focus on?")
+            bot.send_text_message(senderId, "So you want the Fit Sensei to give you a workout huh? I'll give you the workout of your life")
+            send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
             currPath = 2
         elif currPath == 2:
             if message == "lower body" or message == "lower" or workoutTag == "lower":
@@ -211,7 +219,13 @@ def handleMessage(message,senderId):
         elif currPath == 3:
             if message == "easy" or message == "medium" or message == "hard":
                 bot.send_text_message(senderId, "Here is a workout for you!")
-                generateWorkout(senderId, workoutTag, message)                    
+                sendAction(senderId)
+                generateWorkout(senderId, workoutTag, message)       
+                send_quickreplyinit(senderId, "Is there anything else I can help you with?")
+                mainTag = 1
+                currPath = 1
+            else:
+                pass
         else:
             pass
     elif mainTag == 4: 
@@ -234,7 +248,7 @@ def handleMessage(message,senderId):
                 response = "Sorry but that is not a valid weight"
                 bot.send_text_message(senderId, response)
                 bot.send_text_message(senderId, "How much do you weigh now?")
-                currPath = 2                
+                currPath = 2        
     else:
         response = "I don't understand you"
         bot.send_text_message(senderId, response)   
@@ -327,21 +341,22 @@ def generatePlan(senderId, uWeight, uGoalWeight, uActivity):
 def generateWorkout(senderId, category, difficulty):
     random.seed()
     populate_table()
-    if difficulty == "easy":
-        reps = random.randint(10, 15)
-    elif difficulty == "medium":
-        reps = random.randint(10, 15) * 2
-    else:
-        reps = random.randint(10, 15) * 3
     conn = sqlite3.connect('work.db')
 
     b = conn.cursor()
 
     b.execute("SELECT * FROM work WHERE category =? ", (category,))
-    hold = b.fetchall()
+    hold = b.fetchmany(4)
     for ex in hold:
+        random.seed()
+        if difficulty == "easy":
+            reps = random.randint(10, 15)
+        elif difficulty == "medium":
+            reps = random.randint(10, 15) * 2
+        else:
+            reps = random.randint(10, 15) * 3
         bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
-    bot.send_text_message(senderId, "I believe in you")
+    bot.send_text_message(senderId, "I know you can do it! You are like a roaring river, Unstoppable!")
     conn.commit()
     b.close()
     conn.close()
