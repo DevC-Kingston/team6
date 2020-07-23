@@ -286,7 +286,7 @@ def checkProgress(senderId, currWeight):
         if weightLost < 1:
             bot.send_text_message(senderId, "You may not have lost any weight yet but keep trying and you will!")
         else:
-            bot.send_text_message(senderId, "You've lost" +str(weightLost)+ " pounds~, well come my young grasshopper")
+            bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds since you've started training, well come my young grasshopper")
     conn.commit()
     b.close()
     conn.close()
