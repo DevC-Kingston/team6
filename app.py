@@ -45,13 +45,22 @@ def populate_table():
             c.execute("INSERT INTO work VALUES ('wide squat','lower','https://i.pinimg.com/originals/a0/1f/13/a01f136adebd96e0a78fb49aafeee4d5.png','https://www.youtube.com/watch?v=v2ukjHXbXVo')")
             c.execute("INSERT INTO work VALUES ('russian twist','core','https://image.shutterstock.com/image-vector/woman-doing-russian-twist-exercise-260nw-1316827436.jpg','https://www.youtube.com/watch?v=NeAtimSCxsY')")
             c.execute("INSERT INTO work VALUES ('pull ups','upper','https://cdn-xi3mbccdkztvoept8hl.netdna-ssl.com/wp-content/uploads/watermarked/Pullup_M_WorkoutLabs.png','https://www.youtube.com/watch?v=iUNoLR0pYjY')")
+            c.execute("INSERT INTO work VALUES ('incline push up','upper','https://outdoor-fit.com/sites/default/files/2019-10/PushUp.png','https://www.youtube.com/watch?v=Gvm5Q29UHbk')")
+            c.execute("INSERT INTO work VALUES ('decline push up','upper','https://i.pinimg.com/originals/df/d2/03/dfd203a73b157ee8d4720cf69ff3403d.png','https://www.youtube.com/watch?v=PXIpw1JD4qw')")
+            c.execute("INSERT INTO work VALUES ('dips','upper','https://cdn1.iconfinder.com/data/icons/home-workout-2/512/bench-dips-exercise-home-workout-128.png','https://www.youtube.com/watch?v=0326dy_-CzM')")
+            c.execute("INSERT INTO work VALUES ('bent leg v up','core','https://image.shutterstock.com/image-vector/men-doing-bent-leg-vup-260nw-1772886590.jpg','https://www.youtube.com/watch?v=Ut_n2Rw5o9k')")
+            c.execute("INSERT INTO work VALUES ('side to side crunch','core','https://is2-ssl.mzstatic.com/image/thumb/Purple118/v4/8c/3d/85/8c3d858a-90db-dd05-463c-a7d8e52a8d86/source/256x256bb.jpg','https://www.youtube.com/watch?v=cYnx9bL9D9s')")
+            c.execute("INSERT INTO work VALUES ('side plank dip','core','https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQoDL3JwYNaFQkDa5VyK6ZsgQNB-FjncrQFQw&usqp=CAU','https://www.youtube.com/watch?v=BWQRVB4LyFI')")
+            c.execute("INSERT INTO work VALUES ('forward backward lunge','lower','https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/workouts/2016/05/take-it-with-you-composites4-1462306310.jpg?resize=480:*','https://www.youtube.com/watch?v=1THMOdllqks')")
+            c.execute("INSERT INTO work VALUES ('lunge kick','lower','https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/1107-reverse-lunge-kick-1441032989.jpg','https://www.youtube.com/watch?v=HSu25lXUXS0')")
+            c.execute("INSERT INTO work VALUES ('single leg squat','lower','https://www.fitstream.com/images/bodyweight-training/bodyweight-exercises/single-leg-squat.png','https://www.youtube.com/watch?v=9_Ca2YRRdtE')")
             conn.commit()
             c.close()
             conn.close()
     except sqlite3.Error as e:
         print(e)
     log("HERE\nHERE\nHERE)")
-    conn2 = sqlite3.connect('usertest.db')
+    conn2 = sqlite3.connect('user.db')
     c2 = conn2.cursor()
     c2.execute("""CREATE TABLE IF NOT EXISTS users (
                 psid TEXT,
@@ -70,6 +79,7 @@ def verify():
         if not request.args.get("hub.verify_token") == VERIFY_TOKEN:
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
+    getStarted()
     return "Hello World", 200
 
 mainTag = 0
@@ -88,6 +98,7 @@ def webhook():
     global workoutTag
     global initJoin
     bot_id = data["entry"][0]["id"]
+    populate_table()
     if data['object'] == 'page':
         for entry in data['entry']:
             for messaging_event in entry['messaging']:
@@ -140,7 +151,6 @@ def webhook():
 
 def handleMessage(message,senderId):
     # message = message.lower()
-    populate_table()
     global mainTag
     global currPath
     global workoutTag
@@ -152,7 +162,7 @@ def handleMessage(message,senderId):
             bot.send_text_message(senderId, "Nǐ hǎo " +userfname.get("first_name")+ ", Welcome to Fit Sensei!")   
         send_quickreplyinit(senderId, "What can I do for you?")
     elif mainTag == 2:
-        conn = sqlite3.connect('usertest.db')
+        conn = sqlite3.connect('user.db')
         b = conn.cursor()
         b.execute("SELECT * FROM users WHERE psid=?", (senderId,))
         ex = b.fetchone()
@@ -211,12 +221,16 @@ def handleMessage(message,senderId):
         elif currPath == 2:
             if message == "lower body" or message == "lower" or workoutTag == "lower":
                 workoutTag = "lower"
+                send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "core" or workoutTag == "core":
                 workoutTag = "core"
+                send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "upper body" or message == "upper" or workoutTag == "upper":
                 workoutTag = "upper"
-            send_quickreplydiff(senderId, "How intense do you want the workout?")
-            currPath = 3
+                send_quickreplydiff(senderId, "How intense do you want the workout?")
+                currPath = 3
+            else:
+                pass
         elif currPath == 3:
             if message == "easy" or message == "medium" or message == "hard":
                 bot.send_text_message(senderId, "Here is a workout for you!")
@@ -241,21 +255,31 @@ def handleMessage(message,senderId):
             mainTag = 1
             currPath = 1
     elif mainTag == 5: 
-        if currPath == 1:
-            bot.send_text_message(senderId, "So you wish to see your progress")
-            bot.send_text_message(senderId, "Well, how much do you weigh now?")
-            currPath = 2
-        elif currPath == 2:
-            if message.isnumeric():
-                checkProgress(senderId, int(message))
-                send_quickreplyinit(senderId, "What would you like help with?")
-                mainTag = 1
-                currPath = 1
-            else:
-                response = "Sorry but that is not a valid weight"
-                bot.send_text_message(senderId, response)
-                bot.send_text_message(senderId, "How much do you weigh now?")
-                currPath = 2        
+        conn = sqlite3.connect('user.db')
+        b = conn.cursor()
+        b.execute("SELECT * FROM users WHERE psid=?", (senderId,))
+        ex = b.fetchone()
+        if ex == None:
+            bot.send_text_message(senderId, "You have not signed up to be one of my students, you must select lose weight first")
+            send_quickreplyinit(senderId, "What would you like to do?")
+            mainTag = 1
+            currPath = 1
+        else:
+            if currPath == 1:
+                bot.send_text_message(senderId, "So you wish to see your progress")
+                bot.send_text_message(senderId, "Well, how much do you weigh now?")
+                currPath = 2
+            elif currPath == 2:
+                if message.isnumeric():
+                    checkProgress(senderId, int(message))
+                    send_quickreplyinit(senderId, "What would you like help with?")
+                    mainTag = 1
+                    currPath = 1
+                else:
+                    response = "Sorry but that is not a valid weight"
+                    bot.send_text_message(senderId, response)
+                    bot.send_text_message(senderId, "How much do you weigh now?")
+                    currPath = 2  
     else:
         response = "I don't understand you"
         bot.send_text_message(senderId, response)   
@@ -272,7 +296,7 @@ def handleMessage(message,senderId):
     
 def checkProgress(senderId, currWeight):
     populate_table()
-    conn = sqlite3.connect('usertest.db')
+    conn = sqlite3.connect('user.db')
     b = conn.cursor()
     b.execute("SELECT * FROM users WHERE psid=?", (senderId,))
     ex = b.fetchone()
@@ -298,7 +322,7 @@ def generatePlan(senderId, uWeight, uGoalWeight, uActivity):
     global currPath
     today = date.today()
     d1 = today.strftime("%d-%m-%Y")
-    conn = sqlite3.connect('usertest.db')
+    conn = sqlite3.connect('user.db')
     b = conn.cursor()
     b.execute("INSERT INTO users (psid, start_weight, goal_weight, start_date) VALUES (?, ?, ?, ?)", (senderId, uWeight, uGoalWeight, d1))
     conn.commit()
