@@ -30,17 +30,17 @@ Tech Stack & Documentation:
 
 ## Challenges we ran into
 1. It was difficult at times for us to all meet up and work as a team due to varying work schedules
-2. 
+2. Another Challenge we had was handling how to calculate the work plan the user should get to provide good workout advice
  
  
 ## Accomplishments that we're proud of
-* Accomplishment 1
-* Accomplishment 2
+* We are really proud of being able to work with the Facebook API and create a bot that one can actually use on the Internet
+* It also brings us great joy to create an application that can improve someone's quality of life as health is very important aspect of life
 
 
 ## What we learned
-* Learning 1
-* Learning 2
+* We learned about the Facebook API, webhooks and how to make chatbots
+* We also learned how to program in Python
 
 
 ## What's next for “Insert Your Bot Name”
