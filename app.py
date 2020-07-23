@@ -120,7 +120,7 @@ def webhook():
                                 currPath = 1
                                 workoutTag = None
                                 bot.send_text_message(senderId, "Thank you for using Fit Sensei! Please come back to my dojo soon")
-                                bot.send_text_message(senderId, "Sayaonara")
+                                bot.send_text_message(senderId, "Zàijiàn")
                                 sendAction(senderId)
                                 bot.send_image_url(senderId, "https://media.tenor.com/images/ddea728f093b044c694be9561096813b/raw")
                             else:
@@ -174,12 +174,12 @@ def handleMessage(message,senderId):
             elif currPath == 3:
                 if message.isnumeric():
                     uGoalWeight = uWeight - int(message)
-                    bot.send_text_message(senderId, "Noted... How many days do you work out in a week?")            
+                    bot.send_text_message(senderId, "Noted. How many days do you work out in a week?")            
                     currPath = 4
                 else:
-                    response = "Sorry but that is not a valid amount of pounds..."
+                    response = "Sorry but that is not a valid weight"
                     bot.send_text_message(senderId, response)
-                    bot.send_text_message(senderId, "How many pounds would you like to lose")
+                    bot.send_text_message(senderId, "How many pounds would you like to lose?")
                     currPath = 3
             elif currPath == 4:
                 if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
@@ -232,7 +232,7 @@ def handleMessage(message,senderId):
         if currPath == 1:
             bot.send_text_message(senderId, "You wish to learn about an exersise I see")
             bot.send_text_message(senderId, "Well you've come to the right sensei")
-            bot.send_text_message(senderId, "What exercise would you like to know about?")
+            bot.send_text_message(senderId, "What exercise would you like to learn?")
             currPath = 2
         elif currPath == 2:
             findExercise(senderId, message)
@@ -250,7 +250,7 @@ def handleMessage(message,senderId):
                 bot.send_text_message(senderId, "How much do you weigh now?")
                 currPath = 2        
     else:
-        response = "I don't understand you"
+        response = "I'm sorry I don't understand you"
         bot.send_text_message(senderId, response)   
     #elif message.find("bye") >= 0 or message.find("goodbye") >= 0 or message.find("later") >= 0:
      #   return "Goodbye! Stop by Anytime!"
@@ -279,7 +279,7 @@ def checkProgress(senderId, currWeight):
         bot.send_text_message(senderId, "I don't see you in my student list, you need to sign up in lose weight first")
     else:
         weightLost = int(ex[1]) - currWeight
-        bot.send_text_message(senderId, "You've lost" +str(weightLost)+ " pounds")
+        bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds")
     conn.commit()
     b.close()
     conn.close()
