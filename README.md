@@ -45,8 +45,8 @@ Tech Stack & Documentation:
 
 ## What's next for “Fit Sensei”
 Product Roadmap - next features for example
-1. To see past workouts done by date
-1. To enable the chatbot to understand fitness pictures sent by the users
+1. Integration with wit.ai
+1. To enable the chatbot to understand fitness pictures/videos sent by the users
 
 
 ## Built With - provide the tech stack used 
