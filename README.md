@@ -43,15 +43,15 @@ Tech Stack & Documentation:
 * We also learned how to program in Python
 
 
-## What's next for “Insert Your Bot Name”
+## What's next for “Fit Sensei”
 Product Roadmap - next features for example
-1. Feature 1
-1. Feature 2
+1. To see past workouts done by date
+1. To enable the chatbot to understand fitness pictures sent by the users
 
 
 ## Built With - provide the tech stack used 
-* example1
-* example2
+* Python
+* SQLite
 
 
 ## Try it out
