@@ -56,4 +56,3 @@ Product Roadmap - next features for example
 
 ## Try it out
 https://devc-kingston.github.io/team6/
-https://github.com/DevC-Kingston/team6
