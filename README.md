@@ -1,5 +1,6 @@
 # Fit Sensei
 
+[//]: <> (Please use this Winning Hackathon Application as an example:
 
 **Team Members**: Kamaria Nixon, Phillip Miller, Matthew Williams, Kevaughn Dixon, Mark Gbalazeh
 
