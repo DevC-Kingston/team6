@@ -185,19 +185,19 @@ def handleMessage(message,senderId):
             elif currPath == 3:
                 if message.isnumeric():
                     uGoalWeight = uWeight - int(message)
-                    bot.send_text_message(senderId, "Noted. How many days do you work out in a week?")            
+                    bot.send_text_message(senderId, "Noted... How many days do you work out in a week?")            
                     currPath = 4
                 else:
-                    response = "Sorry but that is not a valid weight"
+                    response = "Sorry but that is not a valid amount of pounds..."
                     bot.send_text_message(senderId, response)
-                    bot.send_text_message(senderId, "How many pounds would you like to lose?")
+                    bot.send_text_message(senderId, "How many pounds would you like to lose")
                     currPath = 3
             elif currPath == 4:
                 if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
                     bot.send_text_message(senderId, "Creating a Workout just to help you reach that goal... ")     
                     sendAction(senderId)
-                   currPath = 1
-                     generatePlan(senderId, uWeight, uGoalWeight, int(message))
+                    generatePlan(senderId, uWeight, uGoalWeight, int(message))
+                    currPath = 1
                     mainTag = 1
                     send_quickreplyinit(senderId, "What would you like to do?")
                 else:
@@ -247,7 +247,7 @@ def handleMessage(message,senderId):
         if currPath == 1:
             bot.send_text_message(senderId, "You wish to learn about an exersise I see")
             bot.send_text_message(senderId, "Well you've come to the right sensei")
-            bot.send_text_message(senderId, "What exercise would you like to learn?")
+            bot.send_text_message(senderId, "What exercise would you like to know about?")
             currPath = 2
         elif currPath == 2:
             findExercise(senderId, message)
@@ -281,7 +281,7 @@ def handleMessage(message,senderId):
                     bot.send_text_message(senderId, "How much do you weigh now?")
                     currPath = 2  
     else:
-        response = "I'm sorry I don't understand you"
+        response = "I don't understand you"
         bot.send_text_message(senderId, response)   
   #          pounds = int(message)
    #         cals = 3500 * pounds
@@ -307,14 +307,10 @@ def checkProgress(senderId, currWeight):
         bot.send_text_message(senderId, "Your starting weight was "+str(ex[1]))
         bot.send_text_message(senderId, "Your current weight is "+str(currWeight))
         weightLost = int(ex[1]) - currWeight
-<<<<<<< HEAD
-        bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds")
-=======
         if weightLost < 1:
             bot.send_text_message(senderId, "You may not have lost any weight yet but keep trying and you will!")
         else:
             bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds since you've started training, well come my young grasshopper")
->>>>>>> 9fee8666b10a849460fbcbde488c57761ea0eb56
     conn.commit()
     b.close()
     conn.close()
