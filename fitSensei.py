@@ -28,10 +28,10 @@ def handle_messages():
                     if(sender_id != bot_id):
                         recipient_id = messaging_event["recipient"]["id"]
                         message_text = messaging_event["message"]["text"]
-                        userinfo = json.loads(getFirstName(sender_id))
+                        userfname = json.loads(getFirstName(sender_id))
                         response = 'Sorry, I do not understand that as yet'
                         if message_text in GREETINGS:
-                            response = 'Nǐ hǎo ' +userinfo.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
+                            response = 'Nǐ hǎo ' +userfname.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
                             send_quickreply(sender_id, response)
                         elif message_text == "Reach your goals":
                             response = "You selected reach your goals"
