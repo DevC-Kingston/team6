@@ -19,27 +19,31 @@ def handle_verification():
 def handle_messages():
     data = request.get_json()
     log(data)
-    
+    bot_id = data["entry"][0]["id"]
     if data["object"] == "page":
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
-                    recipient_id = messaging_event["recipient"]["id"]
-                    message_text = messaging_event["message"]["text"]
-                    userinfo = json.loads(getFirstName(sender_id))
-                    response = 'Sorry, I do not understand that as yet'
-                    if message_text in GREETINGS:
-                        response = 'Nǐ hǎo ' +userinfo.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
-                        send_quickreply(sender_id, response)
-                    elif message_text == "Track my progress":
-                        response = "You selected track your progress"
-                        send_message(sender_id, response)
-                    elif message_text == "find exercise":
-                        response = "You selected find exercise"
-                        send_message(sender_id, response)
-                    else:
-                        send_message(sender_id, response)
+                    if(sender_id != bot_id):
+                        recipient_id = messaging_event["recipient"]["id"]
+                        message_text = messaging_event["message"]["text"]
+                        userfname = json.loads(getFirstName(sender_id))
+                        response = 'Sorry, I do not understand that as yet'
+                        if message_text in GREETINGS:
+                            response = 'Nǐ hǎo ' +userfname.get("first_name")+ ', Welcome to Fit Sensei, what would you like to do?' 
+                            send_quickreply(sender_id, response)
+                        elif message_text == "Reach your goals":
+                            response = "You selected reach your goals"
+                            send_message(sender_id, response)
+                        elif message_text == "Track my progress":
+                            response = "You selected track your progress"
+                            send_message(sender_id, response)
+                        elif message_text == "Find an exercise":
+                            response = "You selected find an exercise"
+                            send_message(sender_id, response)
+                        else:
+                            send_message(sender_id, response)
                 if messaging_event.get("delivery"):
                     pass
 
@@ -91,14 +95,19 @@ def send_quickreply(recipient_id, message_text):
             "text": message_text,
             "quick_replies": [
                 {
+                   "content_type": "text",
+                   "title": "Reach your goals",
+                   "payload": "POSTBACK_GOALS",
+                },
+                {
                     "content_type": "text",
-                    "title": "Find Exercise",
-                    "payload": "POSTBACK_PAYLOAD1"
+                    "title": "Find an Exercise",
+                    "payload": "POSTBACK_FINDEX",
                 },
                 {
                     "content_type": "text",
                     "title": "Track my progress",
-                    "payload": "POSTBACK_PAYLOAD2"
+                    "payload": "POSTBACK_TRACKP",
                 }
             ]
         }
