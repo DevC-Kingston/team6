@@ -280,7 +280,7 @@ def checkProgress(senderId, currWeight):
         bot.send_text_message(senderId, "I don't see you in my student list, you need to sign up in lose weight first")
     else:
         bot.send_text_message(senderId, "Here is your progress report")
-        bot.send_text_message(senderId, "Your starting weight was "+str(ex[1])
+        bot.send_text_message(senderId, "Your starting weight was "+str(ex[1]))
         bot.send_text_message(senderId, "Your current weight is "+str(currWeight))
         weightLost = int(ex[1]) - currWeight
         if weightLost < 1:
