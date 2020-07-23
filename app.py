@@ -8,6 +8,7 @@ from Credentials import *
 import sqlite3
 from sqlite3 import Error
 from datetime import date
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -185,8 +186,8 @@ def handleMessage(message,senderId):
                 if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
                     bot.send_text_message(senderId, "Creating a Workout just to help you reach that goal... ")     
                     sendAction(senderId)
-                    generatePlan(senderId, uWeight, uGoalWeight, int(message))
-                    currPath = 1
+                   currPath = 1
+                     generatePlan(senderId, uWeight, uGoalWeight, int(message))
                     mainTag = 1
                     send_quickreplyinit(senderId, "What would you like to do?")
                 else:
@@ -236,14 +237,20 @@ def handleMessage(message,senderId):
             currPath = 2
         elif currPath == 2:
             findExercise(senderId, message)
+            send_quickreplyinit(senderId, "What would you like help with?")
+            mainTag = 1
+            currPath = 1
     elif mainTag == 5: 
         if currPath == 1:
             bot.send_text_message(senderId, "So you wish to see your progress")
-            bot.send_text_message(senderId, "How much do you weigh now?")
+            bot.send_text_message(senderId, "Well, how much do you weigh now?")
             currPath = 2
         elif currPath == 2:
             if message.isnumeric():
                 checkProgress(senderId, int(message))
+                send_quickreplyinit(senderId, "What would you like help with?")
+                mainTag = 1
+                currPath = 1
             else:
                 response = "Sorry but that is not a valid weight"
                 bot.send_text_message(senderId, response)
@@ -252,12 +259,6 @@ def handleMessage(message,senderId):
     else:
         response = "I'm sorry I don't understand you"
         bot.send_text_message(senderId, response)   
-    #elif message.find("bye") >= 0 or message.find("goodbye") >= 0 or message.find("later") >= 0:
-     #   return "Goodbye! Stop by Anytime!"
-   # elif message in POUNDS:
-    #    if message == "more":
-   #         return "Just keep to the training! You will become fit! ~Sensei Fit!!~"
-  #      else:
   #          pounds = int(message)
    #         cals = 3500 * pounds
     #        base = 10 / 850
@@ -278,8 +279,18 @@ def checkProgress(senderId, currWeight):
     if ex == None:
         bot.send_text_message(senderId, "I don't see you in my student list, you need to sign up in lose weight first")
     else:
+        bot.send_text_message(senderId, "Here is your progress report")
+        bot.send_text_message(senderId, "Your starting weight was "+str(ex[1]))
+        bot.send_text_message(senderId, "Your current weight is "+str(currWeight))
         weightLost = int(ex[1]) - currWeight
+<<<<<<< HEAD
         bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds")
+=======
+        if weightLost < 1:
+            bot.send_text_message(senderId, "You may not have lost any weight yet but keep trying and you will!")
+        else:
+            bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds since you've started training, well come my young grasshopper")
+>>>>>>> 9fee8666b10a849460fbcbde488c57761ea0eb56
     conn.commit()
     b.close()
     conn.close()
@@ -346,16 +357,20 @@ def generateWorkout(senderId, category, difficulty):
     b = conn.cursor()
 
     b.execute("SELECT * FROM work WHERE category =? ", (category,))
-    hold = b.fetchmany(4)
+    hold = b.fetchall()
+    random.shuffle(hold)
+    count = 0
     for ex in hold:
-        random.seed()
-        if difficulty == "easy":
-            reps = random.randint(10, 15)
-        elif difficulty == "medium":
-            reps = random.randint(10, 15) * 2
-        else:
-            reps = random.randint(10, 15) * 3
-        bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
+        if count <=3:
+            random.seed()
+            if difficulty == "easy":
+                reps = random.randint(10, 15)
+            elif difficulty == "medium":
+                reps = random.randint(10, 15) * 2
+            else:
+                reps = random.randint(10, 15) * 3
+            bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
+            count = count + 1
     bot.send_text_message(senderId, "I know you can do it! You are like a roaring river, Unstoppable!")
     conn.commit()
     b.close()
@@ -381,7 +396,7 @@ def findExercise(senderId, message):
             'image_url': ex[2]
         }
         elements.append(element)
-        bot.send_text_message(senderId, "Here you go!")
+        bot.send_text_message(senderId, "Here some information on " +str(ex[0]))
         sendAction(senderId)
         bot.send_generic_message(senderId, elements)
     conn.commit()
