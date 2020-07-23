@@ -1,7 +1,5 @@
 # Fit Sensei
 
-[//]: <> (Please use this Winning Hackathon Application as an example:
-https://devpost.com/software/rewise-ai-powered-revision-bot)
 
 **Team Members**: Kamaria Nixon, Phillip Miller, Matthew Williams, Kevaughn Dixon, Mark Gbalazeh
 
