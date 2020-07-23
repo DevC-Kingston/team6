@@ -6,6 +6,8 @@ import json
 import random
 from Credentials import *
 import sqlite3
+from sqlite3 import Error
+from datetime import date
 
 app = Flask(__name__)
 
@@ -46,16 +48,19 @@ def populate_table():
             conn.close()
     except sqlite3.Error as e:
         print(e)
-    try:
-        conn = sqlite3.connect('user.db')
-        c = conn.cursor()
-        c.execute("""CREATE TABLE IF NOT EXISTS users (
-                    psid TEXT,
-                    start_weight INTEGER,
-                    current_date ,
-                    videourl text
-                    )""")
-
+    log("HERE\nHERE\nHERE)")
+    conn2 = sqlite3.connect('usertest.db')
+    c2 = conn2.cursor()
+    c2.execute("""CREATE TABLE IF NOT EXISTS users (
+                psid TEXT,
+                start_weight INTEGER,
+                goal_weight INTEGER,
+                start_date TEXT
+                )""")
+    conn2.commit()
+    c2.close()
+    conn2.close()
+    
 @app.route('/', methods=['GET'])
 def verify():
     # Webhook verification
@@ -67,8 +72,10 @@ def verify():
 
 mainTag = 0
 currPath = 1
+initJoin = 0
 workoutTag = None
-currWorkPath = 0
+uWeight = 0
+uGoalWeight = 0
 
 @app.route('/', methods=['POST'])
 def webhook():
@@ -77,6 +84,7 @@ def webhook():
     global mainTag
     global currPath
     global workoutTag
+    global initJoin
     bot_id = data["entry"][0]["id"]
     if data['object'] == 'page':
         for entry in data['entry']:
@@ -103,11 +111,15 @@ def webhook():
                             elif messaging_text == "find an exercise" or mainTag == 4:
                                 mainTag = 4
                                 handleMessage(messaging_text, senderId)
-                            else:
+                            elif messaging_text == "track my progress" or mainTag == 5:
                                 mainTag = 5
                                 handleMessage(messaging_text, senderId)
-                                
+                            else:
+                                mainTag = 1
+                                initJoin = 1
+                                handleMessage(messaging_text, senderId)
                         else:
+                            
                             messaging_text = 'no text'
                             response = " no text"
 
@@ -118,58 +130,69 @@ def webhook():
 
 def handleMessage(message,senderId):
     # message = message.lower()
+    populate_table()
     global mainTag
     global currPath
     global workoutTag
+    global uWeight
+    global uGoalWeight
     if mainTag == 1: 
         userfname = json.loads(getFirstName(senderId))
-        bot.send_text_message(senderId, "Hi " +userfname.get("first_name")+ ", Welcome to Fit Sensei.")
-    #    bot.send_text_message(senderId, "Do you want to Lose weight?")      
-        send_quickreplyinit(senderId, "What would you like to do?")
+        if(initJoin == 0):
+            bot.send_text_message(senderId, "Nǐ hǎo " +userfname.get("first_name")+ ", Welcome to Fit Sensei!")   
+        send_quickreplyinit(senderId, "What can I do for you?")
     elif mainTag == 2:
-        if currPath == 1:
-             bot.send_text_message(senderId, "So you would like to lose weight, You've come to the right place")
-             bot.send_text_message(senderId, "How many pounds do you currently weigh?")
-             currPath = 2
-        elif currPath == 2:
-            if message.isnumeric():
-                response = "Okay! and how many pounds would you like to lose?"
-                bot.send_text_message(senderId, response)
-                currPath = 3
-            else:
-                response = "Sorry but that is not a valid weight"
-                bot.send_text_message(senderId, response)
-                bot.send_text_message(senderId, "How many pounds do you currently weigh?")
-                currPath = 2
-        elif currPath == 3:
-            if message.isnumeric():
-                response = "Great! How tall are you (in cm)?"
-                bot.send_text_message(senderId, response)
-                currPath = 4
-            else:
-                response = "Sorry but that is not a valid amount of pounds..."
-                bot.send_text_message(senderId, response)
-                bot.send_text_message(senderId, "How many pounds would you like to lose")
-                currPath = 3
-        elif currPath == 4:
-            if message.isnumeric():
-                bot.send_text_message(senderId, "Noted... How many days do you work out in a week?")            
-                currPath = 5
-            else:
-                response = "Sorry but that is not a valid height..."
-                bot.send_text_message(senderId, response)
-                bot.send_text_message(senderId, "How tall are you? (in cm)")
-                currPath = 4
-        elif currPath == 5:
-            if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
-                bot.send_text_message(senderId, "Creating Workout... ")     
-                sendAction(senderId)
-                currPath = 6
-            else:
-                response = "Sorry but that is not a valid number of days"
-                bot.send_text_message(senderId, response)
-                bot.send_text_message(senderId, "How many days do you work out in a week?")
-                currPath = 5
+        conn = sqlite3.connect('usertest.db')
+        b = conn.cursor()
+        b.execute("SELECT * FROM users WHERE psid=?", (senderId,))
+        ex = b.fetchone()
+        if ex == None:
+            if currPath == 1:
+                 bot.send_text_message(senderId, "I've trained for years to help persons lose weight. You've come to the right place")
+                 bot.send_text_message(senderId, "How many pounds do you currently weigh?")
+                 currPath = 2
+            elif currPath == 2:
+                if message.isnumeric():
+                    uWeight = int(message)
+                    response = "Okay! and how many pounds would you like to lose?"
+                    bot.send_text_message(senderId, response)
+                    currPath = 3
+                else:
+                    response = "Sorry, but that is not a valid weight"
+                    bot.send_text_message(senderId, response)
+                    bot.send_text_message(senderId, "How many pounds do you currently weigh?")
+                    currPath = 2
+            elif currPath == 3:
+                if message.isnumeric():
+                    uGoalWeight = uWeight - int(message)
+                    bot.send_text_message(senderId, "Noted... How many days do you work out in a week?")            
+                    currPath = 4
+                else:
+                    response = "Sorry but that is not a valid amount of pounds..."
+                    bot.send_text_message(senderId, response)
+                    bot.send_text_message(senderId, "How many pounds would you like to lose")
+                    currPath = 3
+            elif currPath == 4:
+                if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
+                    bot.send_text_message(senderId, "Creating a Workout just to help you reach that goal... ")     
+                    sendAction(senderId)
+                    generatePlan(senderId, uWeight, uGoalWeight, int(message))
+                    currPath = 1
+                    mainTag = 1
+                    send_quickreplyinit(senderId, "What would you like to do?")
+                else:
+                    response = "Sorry but that is not a valid number of days"
+                    bot.send_text_message(senderId, response)
+                    bot.send_text_message(senderId, "How many days do you work out in a week?")
+                    currPath = 4
+        else:
+            bot.send_text_message(senderId, "You are already one of my students so you can ask me to track you progress! Haya!")
+            send_quickreplyinit(senderId, "What would you like to do?")
+            mainTag = 1
+            currPath = 1
+        conn.commit()
+        b.close()
+        conn.close()
     elif mainTag == 3:
         if currPath == 1:
             response = "So you want the Fit Sensei to give you a workout huh? I'll give you the workout of your life"
@@ -199,6 +222,19 @@ def handleMessage(message,senderId):
             currPath = 2
         elif currPath == 2:
             findExercise(senderId, message)
+    elif mainTag == 5: 
+        if currPath == 1:
+            bot.send_text_message(senderId, "So you wish to see your progress")
+            bot.send_text_message(senderId, "How much do you weigh now?")
+            currPath = 2
+        elif currPath == 2:
+            if message.isnumeric():
+                checkProgress(senderId, int(message))
+            else:
+                response = "Sorry but that is not a valid weight"
+                bot.send_text_message(senderId, response)
+                bot.send_text_message(senderId, "How much do you weigh now?")
+                currPath = 2                
     else:
         response = "I don't understand you"
         bot.send_text_message(senderId, response)   
@@ -218,35 +254,75 @@ def handleMessage(message,senderId):
     #        bot.send_text_message(senderId, advice)
     #        bot.send_image_url(senderId, "https://cdn6.aptoide.com/imgs/2/f/9/2f9bd46c3059a2f2506cbc4cd4541ac1_icon.png?w=256")
     #        return "Do this and You will lose those Pounds!"
-   # elif message.find("lose weight") >= 0 or message.find("I want to lose weight") >= 0:
-    #    bot.send_text_message(senderId, "Let's burn those Carbs! KA-POW!")
-    #    bot.send_text_message(senderId, "I have A great workout for You!")
-      #  send_quickreplypounds(senderId, "How many pounds would you like to lose?")
-    #elif message.find("thank") >= 0 or message.find("i can") >= 0 or message == "fine" or message.find("i will do") >= 0 or message.find("great") >= 0 or message.find("okay") >= 0:
-    #    return "So you are doing it! Great you Will see The results"
-    #elif message.find("hard") >= 0 or message.find("i can't") >= 0 or message.find("cant") >= 0:
-   #     return "You're Strong You can do it!"
-   # elif message == "no":
-  #      return "Yes! Believe in yourself!"
-   # elif message == "yes" or message.find("i can") >= 0:
-   #     return "I Believe in You! You have it in you"
-   # elif message.find("build") >= 0:
-   #     send_quickreplybuild(senderId, "Where of your body do you wanna work out?")
-   # elif message.find("do i have") >= 0:
-    #    return "You have greatness in you, you can do it"
-   # elif message in BODY:
-  #      if message == "core":
-  #          core(1, senderId)
-  #      if message == "upper":
-    #        upper(1, senderId)
-    #        bot.send_image_url(senderId, "https://is2-ssl.mzstatic.com/image/thumb/Purple118/v4/6c/19/6c/6c196c88-0e97-6341-9120-265189ca6f50/source/256x256bb.jpg")
-    #    if message == "lower":
-    #        lower(1, senderId)
-    #    return "You think you can handle it!?"
-    #else:
-     #   return "Sorry I don't understand"
-def generatePlan(senderId)
     
+def checkProgress(senderId, currWeight):
+    populate_table()
+    conn = sqlite3.connect('usertest.db')
+    b = conn.cursor()
+    b.execute("SELECT * FROM users WHERE psid=?", (senderId,))
+    ex = b.fetchone()
+    if ex == None:
+        bot.send_text_message(senderId, "I don't see you in my student list, you need to sign up in lose weight first")
+    else:
+        weightLost = int(ex[1]) - currWeight
+        bot.send_text_message(senderId, "You've lost" +str(weightLost)+ " pounds")
+    conn.commit()
+    b.close()
+    conn.close()
+        
+    
+def generatePlan(senderId, uWeight, uGoalWeight, uActivity):
+    random.seed()
+    populate_table()
+    global currPath
+    today = date.today()
+    d1 = today.strftime("%d-%m-%Y")
+    conn = sqlite3.connect('usertest.db')
+    b = conn.cursor()
+    b.execute("INSERT INTO users (psid, start_weight, goal_weight, start_date) VALUES (?, ?, ?, ?)", (senderId, uWeight, uGoalWeight, d1))
+    conn.commit()
+    b.close()
+    conn.close()
+    conn = sqlite3.connect('work.db')
+    b = conn.cursor()
+    b.execute("SELECT * FROM work WHERE category = 'upper' ")
+    hold = b.fetchmany(2)
+    for ex in hold:
+        random.seed()
+        if uActivity <= 2:
+            reps = random.randint(10, 15)
+        elif uActivity >= 5:
+            reps = random.randint(10, 15) * 3
+        else:
+            reps = random.randint(10, 15) * 2
+        bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
+    b.execute("SELECT * FROM work WHERE category = 'lower' ")
+    hold = b.fetchmany(2)
+    for ex in hold:
+        random.seed()
+        if uActivity <= 2:
+            reps = random.randint(10, 15)
+        elif uActivity >= 5:
+            reps = random.randint(10, 15) * 3
+        else:
+            reps = random.randint(10, 15) * 2
+        bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
+    b.execute("SELECT * FROM work WHERE category = 'core' ")
+    hold = b.fetchmany(2)
+    for ex in hold:
+        random.seed()
+        if uActivity <= 2:
+            reps = random.randint(10, 15)
+        elif uActivity >= 5:
+            reps = random.randint(10, 15) * 3
+        else:
+            reps = random.randint(10, 15) * 2
+        bot.send_text_message(senderId, "You must do " +str(reps)+ " " +ex[0])
+    bot.send_text_message(senderId, "Keep doing this everyday and you will reach that goal and be Fit like Fit Sensei!")
+    conn.commit()
+    b.close()
+    conn.close()
+    currPath = 1
 
 def generateWorkout(senderId, category, difficulty):
     random.seed()
@@ -309,44 +385,6 @@ def sendAction(recepientId):
     data = json.dumps({"recipient": {"id": recepientId}, "sender_action": "typing_on"})
 
     response = requests.post('https://graph.facebook.com/v2.6/me/messages', headers=headers, params=params, data=data) 
-
-def send_quickreply(recipient_id, message_text):
-    params = {
-        "access_token": PAGE_ACCESS_TOKEN
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "messaging_type": "RESPONSE",
-        "message": {
-            "text": message_text,
-            "quick_replies": [
-                {
-                    "content_type": "text",
-                    "title": "Reach my goals",
-                    "payload": "POSTBACK_PAYLOAD1"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Find an exercise",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Track my progress",
-                    "payload": "POSTBACK_PAYLOAD3"
-                },
-            ]
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v7.0/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
 
 
 
@@ -469,91 +507,6 @@ def send_quickreplydiff(recipient_id, message_text):
         log(r.status_code)
     log(r.text)
     
-def send_quickreplypounds(recipient_id, message_text):
-    params = {
-        "access_token": PAGE_ACCESS_TOKEN
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "messaging_type": "RESPONSE",
-        "message": {
-            "text": message_text,
-            "quick_replies": [
-                {
-                    "content_type": "text",
-                    "title": "10",
-                    "payload": "POSTBACK_PAYLOAD1"
-                },
-                {
-                    "content_type": "text",
-                    "title": "20",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-                {
-                    "content_type": "text",
-                    "title": "30",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-                {
-                    "content_type": "text",
-                    "title": "40",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-                {
-                    "content_type": "text",
-                    "title": "more",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-            ]
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v7.0/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
-
-def send_quickreplybuild(recipient_id, message_text):
-    params = {
-        "access_token": PAGE_ACCESS_TOKEN
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        "recipient": {
-            "id": recipient_id
-        },
-        "messaging_type": "RESPONSE",
-        "message": {
-            "text": message_text,
-            "quick_replies": [
-                {
-                    "content_type": "text",
-                    "title": "Upper",
-                    "payload": "POSTBACK_PAYLOAD1"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Lower",
-                    "payload": "POSTBACK_PAYLOAD2"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Core",
-                    "payload": "POSTBACK_PAYLOAD2"
-                }
-            ]
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v7.0/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
 
 @app.route('/', methods=['GET'])
 def getFirstName(sender_id):
