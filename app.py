@@ -83,7 +83,6 @@ def verify():
         if not request.args.get("hub.verify_token") == VERIFY_TOKEN:
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
-    getStarted()
     return "Hello World", 200
 
 mainTag = 1
