@@ -202,7 +202,7 @@ def handleMessage(message,senderId):
             elif currPath == 4:
                 if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
                     bot.send_text_message(senderId, "Creating a Workout just to help you reach that goal... ")     
-                    #sendAction(senderId)
+                    sendAction(senderId)
                     generatePlan(senderId, uWeight, uGoalWeight, int(message))
                     currPath = 1
                     mainTag = 1
@@ -264,7 +264,7 @@ def handleMessage(message,senderId):
             bot.send_text_message(senderId, "What exercise would you like to know about?")
             currPath = 2
         elif currPath == 2:
-            findExercise(senderId, message)
+            findExercise(senderId, message.lower())
             send_quickreplyinit(senderId, "What would you like help with?")
             mainTag = 1
             currPath = 1
