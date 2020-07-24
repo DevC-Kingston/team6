@@ -250,13 +250,10 @@ def handleMessage(message,senderId):
                 mainTag = 1
                 currPath = 1
                 send_quickreplyinit(senderId, "Is there anything else I can help you with?")
-
             else:
                 bot.send_text_message(senderId, "Sorry, but that isn't a difficulty I know")
                 send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
                 currPath = 2
-        else:
-            pass
     elif mainTag == 4: 
         if currPath == 1:
             bot.send_text_message(senderId, "You wish to learn about an exersise I see")
