@@ -112,6 +112,7 @@ def webhook():
                 
                     if messaging_event.get('message'):
                         if 'text' in messaging_event['message']:
+                            sendAction(senderId)
                             messaging_text = messaging_event['message']['text'].lower()
                             if messaging_text in GREETINGS:
                                 mainTag = 1
@@ -137,9 +138,10 @@ def webhook():
                                 workoutTag = None
                                 bot.send_text_message(senderId, "Thank you for using Fit Sensei! Please come back to my dojo soon")
                                 bot.send_text_message(senderId, "Zàijiàn!... That's Goodbye in Mandarin")
-                                sendAction(senderId)
+                                
                                 bot.send_image_url(senderId, "https://media.tenor.com/images/ddea728f093b044c694be9561096813b/raw")
                             else:
+                                mainTag = 1
                                 initJoin = 1
                                 handleMessage(messaging_text, senderId)
                         else:
@@ -292,7 +294,8 @@ def handleMessage(message,senderId):
                     bot.send_text_message(senderId, "How much do you weigh now?")
                     currPath = 2  
     else:
-        pass
+        response = "I don't understand you"
+        bot.send_text_message(senderId, response)   
   #          pounds = int(message)
    #         cals = 3500 * pounds
     #        base = 10 / 850
