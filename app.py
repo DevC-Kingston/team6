@@ -1,16 +1,20 @@
 import os, sys
+from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request
 from pymessenger import Bot
 import requests
 import json
 import random
-from Credentials import *
+#from Credentials import *
 import sqlite3
 from sqlite3 import Error
 from datetime import date
 from datetime import datetime
 
 app = Flask(__name__)
+load_dotenv()
+PAGE_ACCESS_TOKEN = os.getenv('PAGE_ACCESS_TOKEN')
+VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
 
 bot = Bot(PAGE_ACCESS_TOKEN)
@@ -82,7 +86,7 @@ def verify():
     getStarted()
     return "Hello World", 200
 
-mainTag = 0
+mainTag = 1
 currPath = 1
 initJoin = 0
 workoutTag = None
@@ -156,6 +160,7 @@ def handleMessage(message,senderId):
     global workoutTag
     global uWeight
     global uGoalWeight
+    global initJoin
     if mainTag == 1: 
         userfname = json.loads(getFirstName(senderId))
         if(initJoin == 0):

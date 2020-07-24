@@ -1,3 +1,4 @@
 # The local Credentials files
 __pycache__/Credentials.cpython-38.pyc
 Credentials.py
+.env
