@@ -165,6 +165,7 @@ def handleMessage(message,senderId):
         userfname = json.loads(getFirstName(senderId))
         if(initJoin == 0):
             bot.send_text_message(senderId, "Nǐ hǎo " +userfname.get("first_name")+ ", Welcome to Fit Sensei!")   
+            initJoin == 1
         mainTag = 1
         currPath = 1
         send_quickreplyinit(senderId, "What can I do for you?")
