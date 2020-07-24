@@ -292,7 +292,7 @@ def handleMessage(message,senderId):
                     bot.send_text_message(senderId, "How much do you weigh now?")
                     currPath = 2  
     else:
-        pass:   
+        pass
   #          pounds = int(message)
    #         cals = 3500 * pounds
     #        base = 10 / 850
