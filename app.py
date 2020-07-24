@@ -117,6 +117,7 @@ def webhook():
                             if messaging_text in GREETINGS:
                                 mainTag = 1
                                 currPath = 1
+                                initJoin = 0
                                 workoutTag = None
                                 handleMessage(messaging_text, senderId)
                             elif messaging_text == "lose weight" or mainTag == 2:
@@ -319,11 +320,19 @@ def checkProgress(senderId, currWeight):
         bot.send_text_message(senderId, "Here is your progress report")
         bot.send_text_message(senderId, "Your starting weight was "+str(ex[1]))
         bot.send_text_message(senderId, "Your current weight is "+str(currWeight))
+        bot.send_text_message(senderId, "Your goal weight is "+str(ex[2]))
         weightLost = int(ex[1]) - currWeight
-        if weightLost < 1:
-            bot.send_text_message(senderId, "You may not have lost any weight yet but keep trying and you will!")
+        if currWeight <= ex[2]:
+            bot.send_text_message(senderId, "Excellent Work my pupil! You've hit your goal weight! I knew I saw great potential in you!")
+            sendAction(senderId)
+            bot.send_image_url(senderId, "https://media1.giphy.com/media/hs7Pvg2O3dFqliXKAl/giphy.gif")
         else:
-            bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds since you've started training, well come my young grasshopper")
+            if weightLost == 0:
+                bot.send_text_message(senderId, "You may not have lost any weight yet but keep trying and you will!")
+            elif weightLost < 0:
+                bot.send_text_message(senderId, "Oh no, you've gained " +str(weightLost)+ " pounds since you've started training")
+            else:
+                bot.send_text_message(senderId, "You've lost " +str(weightLost)+ " pounds since you've started training, well done my young grasshopper!")
     conn.commit()
     b.close()
     conn.close()
