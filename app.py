@@ -85,8 +85,8 @@ def verify():
         return request.args["hub.challenge"], 200
     return "Hello World", 200
 
-mainTag = 1
-currPath = 1
+mainTag = 0
+currPath = 0
 initJoin = 0
 workoutTag = None
 uWeight = 0
@@ -293,8 +293,7 @@ def handleMessage(message,senderId):
                     bot.send_text_message(senderId, "How much do you weigh now?")
                     currPath = 2  
     else:
-        response = "I don't understand you"
-        bot.send_text_message(senderId, response)   
+        pass:   
   #          pounds = int(message)
    #         cals = 3500 * pounds
     #        base = 10 / 850
