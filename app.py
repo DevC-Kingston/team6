@@ -214,9 +214,9 @@ def handleMessage(message,senderId):
                     currPath = 4
         else:
             bot.send_text_message(senderId, "You are already one of my students so you can ask me to track you progress! Haya!")
-            send_quickreplyinit(senderId, "What else can I help you with")
             mainTag = 1
             currPath = 1
+            send_quickreplyinit(senderId, "What else can I help you with")
         conn.commit()
         b.close()
         conn.close()
@@ -246,10 +246,11 @@ def handleMessage(message,senderId):
             if message == "easy" or message == "medium" or message == "hard":
                 bot.send_text_message(senderId, "Here is a workout for you!")
                 sendAction(senderId)
-                generateWorkout(senderId, workoutTag, message)       
-                send_quickreplyinit(senderId, "Is there anything else I can help you with?")
+                generateWorkout(senderId, workoutTag, message) 
                 mainTag = 1
                 currPath = 1
+                send_quickreplyinit(senderId, "Is there anything else I can help you with?")
+
             else:
                 bot.send_text_message(senderId, "Sorry, but that isn't a difficulty I know")
                 send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
