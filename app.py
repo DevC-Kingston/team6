@@ -85,8 +85,8 @@ def verify():
         return request.args["hub.challenge"], 200
     return "Hello World", 200
 
-mainTag = 0
-currPath = 0
+mainTag = 1
+currPath = 1
 initJoin = 0
 workoutTag = None
 uWeight = 0
@@ -140,7 +140,6 @@ def webhook():
                                 sendAction(senderId)
                                 bot.send_image_url(senderId, "https://media.tenor.com/images/ddea728f093b044c694be9561096813b/raw")
                             else:
-                                mainTag = 1
                                 initJoin = 1
                                 handleMessage(messaging_text, senderId)
                         else:
