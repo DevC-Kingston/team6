@@ -224,21 +224,25 @@ def handleMessage(message,senderId):
         if currPath == 1:
             bot.send_text_message(senderId, "So you want the Fit Sensei to give you a workout huh? I'll give you the workout of your life")
             send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
+            currPath = 2
+        elif currPath == 2:
             if message == "lower body" or message == "lower" or workoutTag == "lower":
                 workoutTag = "lower"
-                currPath = 2
+                currPath = 3
                 send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "core" or workoutTag == "core":
                 workoutTag = "core"
-                currPath = 2
+                currPath = 3
                 send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "upper body" or message == "upper" or workoutTag == "upper":
                 workoutTag = "upper"
-                currPath = 2
+                currPath = 3
+                send_quickreplydiff(senderId, "How intense do you want the workout?")
             else:
                 bot.send_text_message(senderId, "Sorry, but that isn't an area of the body I know")
-        elif currPath == 2:
-            send_quickreplydiff(senderId, "How intense do you want the workout?")
+                send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
+                currPath = 2
+        elif currPath == 3:
             if message == "easy" or message == "medium" or message == "hard":
                 bot.send_text_message(senderId, "Here is a workout for you!")
                 sendAction(senderId)
@@ -248,6 +252,8 @@ def handleMessage(message,senderId):
                 send_quickreplyinit(senderId, "Is there anything else I can help you with?")
             else:
                 bot.send_text_message(senderId, "Sorry, but that isn't a difficulty I know")
+                send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
+                currPath = 2
     elif mainTag == 4: 
         if currPath == 1:
             bot.send_text_message(senderId, "You wish to learn about an exersise I see")
