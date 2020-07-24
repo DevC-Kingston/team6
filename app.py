@@ -202,7 +202,7 @@ def handleMessage(message,senderId):
             elif currPath == 4:
                 if message.isnumeric() and (int(message) >= 0 and int(message) <=7):
                     bot.send_text_message(senderId, "Creating a Workout just to help you reach that goal... ")     
-                    sendAction(senderId)
+                    #sendAction(senderId)
                     generatePlan(senderId, uWeight, uGoalWeight, int(message))
                     currPath = 1
                     mainTag = 1
