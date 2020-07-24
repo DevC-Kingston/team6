@@ -19,7 +19,7 @@ VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
 bot = Bot(PAGE_ACCESS_TOKEN)
 GREETINGS = ['is anyone available to chat?', 'wah gwaan', 'sup','hey','hi','yo','hello','good afternoon', 'howdy', 'i have a question']
-FAREWELL = ['goodbye', 'bye', 'See you soon', 'Sayonara', 'farewell', "i'm out", 'later']
+FAREWELL = ['goodbye', 'bye', 'See you soon', 'Sayonara', 'farewell', "i'm out", 'later', 'Zàijiàn', 'zaijian']
     
 def populate_table():
     try: 
@@ -133,9 +133,10 @@ def webhook():
                             elif messaging_text in FAREWELL:
                                 mainTag = 1
                                 currPath = 1
+                                initJoin = 0
                                 workoutTag = None
                                 bot.send_text_message(senderId, "Thank you for using Fit Sensei! Please come back to my dojo soon")
-                                bot.send_text_message(senderId, "Zàijiàn")
+                                bot.send_text_message(senderId, "Zàijiàn!... That's Goodbye in Mandarin")
                                 sendAction(senderId)
                                 bot.send_image_url(senderId, "https://media.tenor.com/images/ddea728f093b044c694be9561096813b/raw")
                             else:
@@ -164,6 +165,8 @@ def handleMessage(message,senderId):
         userfname = json.loads(getFirstName(senderId))
         if(initJoin == 0):
             bot.send_text_message(senderId, "Nǐ hǎo " +userfname.get("first_name")+ ", Welcome to Fit Sensei!")   
+        mainTag = 1
+        currPath = 1
         send_quickreplyinit(senderId, "What can I do for you?")
     elif mainTag == 2:
         conn = sqlite3.connect('user.db')
@@ -211,7 +214,7 @@ def handleMessage(message,senderId):
                     currPath = 4
         else:
             bot.send_text_message(senderId, "You are already one of my students so you can ask me to track you progress! Haya!")
-            send_quickreplyinit(senderId, "What would you like to do?")
+            send_quickreplyinit(senderId, "What else can I help you with")
             mainTag = 1
             currPath = 1
         conn.commit()
@@ -225,16 +228,20 @@ def handleMessage(message,senderId):
         elif currPath == 2:
             if message == "lower body" or message == "lower" or workoutTag == "lower":
                 workoutTag = "lower"
+                currPath = 3
                 send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "core" or workoutTag == "core":
                 workoutTag = "core"
+                currPath = 3
                 send_quickreplydiff(senderId, "How intense do you want the workout?")
             elif message == "upper body" or message == "upper" or workoutTag == "upper":
                 workoutTag = "upper"
-                send_quickreplydiff(senderId, "How intense do you want the workout?")
                 currPath = 3
+                send_quickreplydiff(senderId, "How intense do you want the workout?")
             else:
-                pass
+                bot.send_text_message(senderId, "Sorry, but that isn't an area of the body I know")
+                send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
+                currPath = 2
         elif currPath == 3:
             if message == "easy" or message == "medium" or message == "hard":
                 bot.send_text_message(senderId, "Here is a workout for you!")
@@ -244,7 +251,9 @@ def handleMessage(message,senderId):
                 mainTag = 1
                 currPath = 1
             else:
-                pass
+                bot.send_text_message(senderId, "Sorry, but that isn't a difficulty I know")
+                send_quickreplyWorkout(senderId, "Which area of the body would you want to focus on young grasshopper?")
+                currPath = 2
         else:
             pass
     elif mainTag == 4: 
@@ -371,7 +380,6 @@ def generatePlan(senderId, uWeight, uGoalWeight, uActivity):
     conn.commit()
     b.close()
     conn.close()
-    currPath = 1
 
 def generateWorkout(senderId, category, difficulty):
     random.seed()
@@ -401,6 +409,7 @@ def generateWorkout(senderId, category, difficulty):
     conn.close()
 
 def findExercise(senderId, message):
+    populate_table()
     conn = sqlite3.connect('work.db')
 
     b = conn.cursor()
